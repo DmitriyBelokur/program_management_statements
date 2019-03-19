@@ -109,6 +109,29 @@ int main(int argc, char const *argv[]) {
 }
 
 ```
+В С++ есть еще проблема так называемого висячего else, т.е. else относиться к ближайшему if как  часть блока, например
+```
+{
+// логическая ошибка мы ожидаем не ту выполняющую ветку else
+if (a)
+  if (b)
+    foo ();
+else
+  bar ();
+}
+
+{
+if (a)
+ {
+   if (b)
+     foo();
+   else
+     bar();
+  }
+}
+
+```
+
 ## Оператор выбора switch
 В простой форме оператор switch призван заментить многословный оператор if, т.е. вместо многословных `if else if`(который может быть более запутанный), используються читаемый выбор.
 ```cpp
@@ -138,6 +161,29 @@ switch (x) {
 ```
 Важным замечанием switch оператора есть то что после каждой ветки должно идти так называемое прерываение выплнения ветки, иногда это break, а иногда это return, если этого не выполнить то будет выполняться следующая ветка после выпоняемой ветки. Иногда компилятор выдает предупреждение, что мы так называемое проваливаемся (fall through).
 В С++17 есть специальный атрибут [[fallthrough]] который подавляет варнинги компилятора, о том что мы намерено так сделали, т.е. провал между ветками. Ну и показывает читаемому человеку что мы намерено так поступили.
+В опреаторе switch всегда выполняеться ветка case, т.е. есть проблема недостижимости инструкции
+
+```
+// операция i = 15; некогда не будет выполнена
+switch (cond)
+{
+  i = 15;
+  ...
+  case 5:
+  ...
+}
+
+// все будет ок
+switch (cond)
+{
+int i;
+...
+case 5:
+i = 5;
+...
+}
+
+```
 ```cpp
 
 #include <iostream>
@@ -295,3 +341,243 @@ int main(int argc, char const *argv[]) {
   return 0;
 }
 ```
+### Оператор while
+Если например при работе c for мы знаем количество итераций, например при обходе массива, то при работе c оператором while, это если мы не значем точное количество операций, и итерационная переменная может быть гибкая. Еще важным отличием оператора while от for есть то что итерационная переменная всегда выполняеться в конце итерации цикла for, то такой итерации в цикле while нет.
+Оператор while работает следующим образом пока условие истино выполняеться условие
+```
+while(условие) {
+  body
+}
+```
+```cpp
+#include <iostream>
+
+void Print() {
+  std::cout << "Please enter number:" << std::endl;
+  size_t count;
+  std::cin >> count;
+  if (count > 1) {
+   size_t mid = count / 2;
+   int start = mid;
+   size_t end = mid;
+   while (start >= 0) {
+     for (int i = 0; i < start; ++i) {
+        std::cout << ' ';
+     }
+     for (int i = start; i <= end; ++i) {
+        std::cout << '*';
+     }
+     for (int i = end; i < count; ++i) {
+        std::cout << ' ';
+     }
+     --start;
+     ++end;
+     std::cout << '\n';
+   }
+  }
+}
+
+
+void memset_our() {
+  size_t value = 23;
+  while(value >>= 1) {
+    std::cout << "One iteration shift right" << std::endl;
+  }
+  std::cout << "value is " << value << std::endl;
+}
+
+int main(int argc, char const *argv[]) {
+/*  // обьявим бесконечный цикл
+  while (true) {
+    std::cout << "Please enter number or zero to exit" << std::endl;
+    int value;
+    std::cin >> value;
+    if (value > 0) {
+      while (value > 10) {
+          value /= 10;
+      }
+      std::cout << "Last digit is " << value << std::endl; 
+    } else {
+      break;
+    }
+  }
+*/
+  /*Print();
+
+  const char *str = "Hello World";
+  size_t count_white_space = 0;
+  size_t count_l_symbol = 0;
+  while(*str) {
+    char c;
+    switch(c = *str++) {
+      case ' ':
+        ++count_white_space;
+        break;
+      case 'l':
+        ++count_l_symbol;
+        break;        
+    }
+  }
+  std::cout << "whitespace " << count_white_space << " count l " << count_l_symbol << std::endl; 
+
+  std::cout << "Enter value" << std::endl;
+  size_t value;
+  while (std::cin >> value) {
+    std::cout << "Enter " << value << std::endl; 
+  }
+*/
+  memset_our();
+  return 0;
+}
+```
+### Оператор цикла do while
+Отличием оператора do while от while, то что выполниться точно один проход, т.е. условие проверяеться не в конце а в начале
+
+```
+do {
+
+}while(условие);
+
+```
+
+```cpp
+#include <iostream>
+
+/*
+bool WgUtilsApplier::SetWgDevice() const {
+  int ret = 0;
+  wg_device device{};
+
+  memcpy(device.name, wg_dev_name_.c_str(), wg_dev_name_.length());
+  device.listen_port = GetWgListeningPort();
+  device.flags = static_cast<wg_device_flags>(WGDEVICE_HAS_PRIVATE_KEY |
+                                              WGDEVICE_HAS_LISTEN_PORT);
+
+  if (wg_key_is_zero(private_key_)) {
+    OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: wg key is zero for ",
+                      wg_dev_name_.c_str());
+  } else {
+    memcpy(device.private_key, private_key_, sizeof(private_key_));
+    if ((ret = wg_set_device(&device)) < 0) {
+      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to set device for ",
+                        wg_dev_name_.c_str(), " : ", strerror(ret));
+      ret = 0;
+    } else {
+      ret = 1;
+    }
+  }
+  return !!ret;
+*/
+
+/*
+bool WgUtilsApplier::SetWgDevice(const std::string& own_public_key) const {
+  bool result = false;
+  wg_device device{};
+
+  memcpy(device.name, wg_dev_name_.c_str(), wg_dev_name_.length());
+  device.listen_port = GetWgListeningPort();
+  device.flags = static_cast<wg_device_flags>(WGDEVICE_HAS_PRIVATE_KEY |
+                                              WGDEVICE_HAS_LISTEN_PORT);
+
+  do {
+    if (wg_key_is_zero(private_key_)) {
+      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: wg key is zero for ",
+                        wg_dev_name_.c_str());
+      break;
+    }
+
+    memcpy(device.private_key, private_key_, sizeof(private_key_));
+
+    // Set public key to device
+    if (!own_public_key.empty()) {
+      wg_key public_key;
+
+      int ret = wg_key_from_base64(public_key, own_public_key.c_str());
+      if (ret < 0) {
+        OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to convert the public key ",
+                          own_public_key, ": ", strerror(ret));
+        break;
+      }
+
+      if (wg_key_is_zero(public_key)) {
+        OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: public wg key is zero for ",
+                          wg_dev_name_.c_str());
+        break;
+      }
+
+      memcpy(device.public_key, public_key, sizeof(public_key));
+      device.flags = static_cast<wg_device_flags>(device.flags | WGDEVICE_HAS_PUBLIC_KEY);
+    }
+
+    int ret = wg_set_device(&device);
+    if (ret < 0) {
+      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to set device for ",
+                        wg_dev_name_.c_str(), " : ", strerror(ret));
+      break;
+    }
+
+    result = true;
+  } while (false);
+
+  return result;
+}
+*/
+
+int main(int argc, char const *argv[]) {
+  char ch;
+  do {
+    size_t value;
+    std::cout << "Please enter number " << std::endl;
+    std::cin >> value;
+    std::cout << "You are enter " << value << std::endl;
+    //если раскомитеть эту строку, то компилятор выдаст ошибку, что переменная опредена в не области видимости
+/*    char ch = 'Y'; 
+  } while (ch == 'Y');
+*/
+   std::cout << "Exit? Y : N" << std::endl;
+   std::cin >> ch;
+  } while (ch != 'Y');
+
+  http://www.diag.com/news/DoWhileFalse.html
+
+
+  return 0;
+}
+```
+### Тернарный опреатор
+Это просто сокращенная форма if else. Иммеет вид
+```
+переменная = условие ? опреатор в случае истиности : оператор в случае лжи;
+
+if (условие) {
+
+} else {
+
+}
+```
+```cpp
+#include <iostream>
+
+size_t IncDec(size_t value) {
+  return value & 1 ? value + 1 : value - 1;
+}
+
+int main(int argc, char const *argv[])
+{
+    char ch;
+    do {
+        size_t value;
+        std::cin >> value;
+        std::cout << IncDec(value) << std::endl;
+        std::cin >> ch;
+    } while(ch != 'Y');
+
+    size_t a = 5;
+    (void) (a > 5 ? std::cout << " a > 5\n" : std::cout << "a <= 5\n");
+    return 0;
+}
+```
+возвращаемое значение в тернарном операторе должно быть одного типа или иметь неявное преобразование.
+
+
+

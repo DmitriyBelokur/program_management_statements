@@ -83,5 +83,15 @@ int main(int argc, char const *argv[]) {
   Bitset flag = static_cast<Bitset>(Bitset::FIRST_SET_BIT | Bitset::SECOND_SET_BIT);
   CheckSetBit(flag, Bitset::SECOND_SET_BIT);
   CheckSetBit(flag, Bitset::FOURTH_SET_BIT);
+   switch (EnumTest::SECOND)
+    {
+      int i = 30;
+      case 2:
+       printf("i = %d\n", i);
+       break;
+      default:
+       break;
+    }
+
   return 0;
 }
