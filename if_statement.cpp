@@ -1,80 +1,42 @@
 #include <cstdio>
 #include <iostream>
-
-void IsNumberPositive(int number) {
-  printf("IsNumberPositive\n");
-  if (number > 0) {
-    printf("number > 0\n");
-  } else if (number == 0) {
-    printf("number == 0\n");
-  } else {
-    printf("number < 0\n");
-  } 
-}
-
-bool IsOdd(size_t number) {
-  return number & 1;
-}
-
+#include <limits>
 
 int main(int argc, char const *argv[]) {
-  
-  IsNumberPositive(10);
-  IsNumberPositive(0);
-  IsNumberPositive(-10);
 
-  printf("Please enter number :");
-  size_t value;
-  std::cin >> value;
+  const short kShortMin = std::numeric_limits<short>::min();
+  const short kShortMax = std::numeric_limits<short>::max();
+  int value1;
+  // предлагаем пользователю ввести число в указанном диапазоне
+  std::cout << "Please enter number for value1 in range [" << kShortMin
+                                                           << " ... "
+                                                           << kShortMax
+                                                           << "]"
+                                                           << std::endl;
 
-  if (IsOdd(value)) {
-    printf("Number %zd is odd \n", value);
-  } else {
-    printf("Number %zd is even \n", value);
+  // ожидаем ввода от пользователя
+  std::cin >> value1;
+
+  if (value1 < kShortMin || value1 > kShortMax) {
+    std::cout << "You entered an invalid value for value1, please try again\n";
+    return 1;
   }
 
-  printf("Please enter number :");
-  if ((std::cin >> value, IsOdd(value))) {
-    printf("Number %zd is odd \n", value);
-  } else {
-    printf("Number %zd is even \n", value);
+  int value2;
+  std::cout << "Please enter number for value2 in range [" << kShortMin
+                                                           << " ... "
+                                                           << kShortMax
+                                                           << "]"
+                                                           << std::endl;
+
+  // ожидаем ввода от пользователя
+  std::cin >> value2;
+
+  if (value2 < kShortMin || value2 > kShortMax) {
+    std::cout << "You entered an invalid value, please try again\n";
+    return 1;
   }
 
-  // работает только начиная с С++17
-  /*if (size_t value1 = 0; std::cin >> value1) {
-    if (IsOdd(value1)) {
-      printf("Number %zd is odd \n", value1);
-    } else {
-      printf("Number %zd is even \n", value1);
-    }
-  }*/
-
-  printf("Please enter number :");
-  if (std::cin >> value) {
-    printf("You are entered %zd\n", value);
-  } else {
-    printf("Error in stdin stream \n");
-  }
-
-  printf("Please enter number :");
-  std::cin >> value;
-  if (value > 100 && value < 200) {
-    printf("value %d is in range (100..200):");
-  } else {
-    printf("value %d is not in range (100..200):");
-  }
-
-  printf("Please enter number :");
-  std::cin >> value;
-  if (value > 100 && value < 200) {
-    if (value >= 50 && value <= 70) {
-      printf("value %d is in range [50..70]:");
-    } else {
-      printf("value %d is in range (100..200):");
-    }
-  } else {
-    printf("value %d is not in range (100..200):");
-  }
-
+  std::cout << value1 << " " << value2 << std::endl;
   return 0;
 }

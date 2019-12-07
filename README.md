@@ -48,61 +48,47 @@ bool IsOdd(size_t number) {
 
 int main(int argc, char const *argv[]) {
   
-  IsNumberPositive(10);
-  IsNumberPositive(0);
-  IsNumberPositive(-10);
+  // IsNumberPositive(10);
+  // IsNumberPositive(0);
+  // IsNumberPositive(-10);
 
   printf("Please enter number :");
   size_t value;
   std::cin >> value;
-
-  if (IsOdd(value)) {
-    printf("Number %zd is odd \n", value);
+  
+  if (value > 0) {
+    std::cout << "number > 0" << std::endl;
+  } else if (number == 0) {
+    std::cout << "number == 0" << std::endl;
   } else {
-    printf("Number %zd is even \n", value);
+    std::cout << "number < 0" << std::endl;
+  } 
+
+  if (value & 1) { // check first(0) bit in value id set
+    std::cout << "Number " << value << " is odd" << std::endl;
+  } else {
+    std::cout << "Number " << value << " is even" << std::endl;
   }
 
-  printf("Please enter number :");
-  if ((std::cin >> value, IsOdd(value))) {
-    printf("Number %zd is odd \n", value);
-  } else {
-    printf("Number %zd is even \n", value);
-  }
-
-  // работает только начиная с С++17
-  /*if (size_t value1 = 0; std::cin >> value1) {
-    if (IsOdd(value1)) {
-      printf("Number %zd is odd \n", value1);
-    } else {
-      printf("Number %zd is even \n", value1);
-    }
-  }*/
-
-  printf("Please enter number :");
+  // это условие служит для проверки коректное ли ввел пользователь ввел число с экрана
+  std::cout << "Please enter number :" << std::endl;
   if (std::cin >> value) {
-    printf("You are entered %zd\n", value);
+    std::cout << "You are entered " << value << std::endl;
   } else {
-    printf("Error in stdin stream \n");
+    std::cout << "error entering number"  << std::endl;
   }
 
-  printf("Please enter number :");
-  std::cin >> value;
-  if (value > 100 && value < 200) {
-    printf("value %d is in range (100..200):");
-  } else {
-    printf("value %d is not in range (100..200):");
-  }
-
-  printf("Please enter number :");
+  //  это проверка диапазона числа, т.е. входит ли число в заданный диапазон
+  std::cout << "Please enter number :";
   std::cin >> value;
   if (value > 100 && value < 200) {
     if (value >= 50 && value <= 70) {
-      printf("value %d is in range [50..70]:");
+      std::cout << "value %d is in range [50..70]:" << std::endl;
     } else {
-      printf("value %d is in range (100..200):");
+       std::cout << "value %d is in range (100..200):" << std::endl;
     }
   } else {
-    printf("value %d is not in range (100..200):");
+     std::cout << "value %d is not in range (100..200):" << std::endl;;
   }
 
   return 0;
@@ -131,9 +117,56 @@ if (a)
 }
 
 ```
+Вывод с этого следует очень простой, старайтесь в операторе `if` всегда выделять блок спомощью `{}` и у вас не будет множества логических ошибок. 
 
+Но иногда есть некое название понятию `if-else` а именно спагети код. Т.е. вместо сложных запутанных конструкций `if-else` пишут `if` который бы проверял некоректное условие и выходил, этот способ дает больше читабельности вашего кода.
+```cpp
+#include <cstdio>
+#include <iostream>
+#include <limits>
+
+int main(int argc, char const *argv[]) {
+
+  const short kShortMin = std::numeric_limits<short>::min();
+  const short kShortMax = std::numeric_limits<short>::max();
+  int value1;
+  // предлагаем пользователю ввести число в указанном диапазоне
+  std::cout << "Please enter number for value1 in range [" << kShortMin
+                                                           << " ... "
+                                                           << kShortMax
+                                                           << "]"
+                                                           << std::endl;
+
+  // ожидаем ввода от пользователя
+  std::cin >> value1;
+
+  if (value1 < kShortMin || value1 > kShortMax) {
+    std::cout << "You entered an invalid value for value1, please try again\n";
+    return 1;
+  }
+
+  int value2;
+  std::cout << "Please enter number for value2 in range [" << kShortMin
+                                                           << " ... "
+                                                           << kShortMax
+                                                           << "]"
+                                                           << std::endl;
+
+  // ожидаем ввода от пользователя
+  std::cin >> value2;
+
+  if (value2 < kShortMin || value2 > kShortMax) {
+    std::cout << "You entered an invalid value, please try again\n";
+    return 1;
+  }
+
+  std::cout << value1 << " " << value2 << std::endl;
+  return 0;
+}
+
+```
 ## Оператор выбора switch
-В простой форме оператор switch призван заментить многословный оператор if, т.е. вместо многословных `if else if`(который может быть более запутанный), используються читаемый выбор.
+Опереатор выбор чем то аналогичный оператору `if-else` с линейной формой выбора. Но оператор выбора к сожалению не такой гибкий как оператор `if-else`
 ```cpp
 if (x == 5) {
 
@@ -159,121 +192,43 @@ switch (x) {
   break;
 }
 ```
-Важным замечанием switch оператора есть то что после каждой ветки должно идти так называемое прерываение выплнения ветки, иногда это break, а иногда это return, если этого не выполнить то будет выполняться следующая ветка после выпоняемой ветки. Иногда компилятор выдает предупреждение, что мы так называемое проваливаемся (fall through).
-В С++17 есть специальный атрибут [[fallthrough]] который подавляет варнинги компилятора, о том что мы намерено так сделали, т.е. провал между ветками. Ну и показывает читаемому человеку что мы намерено так поступили.
-В опреаторе switch всегда выполняеться ветка case, т.е. есть проблема недостижимости инструкции
+Важным замечанием switch оператора есть то что после каждой ветки должно идти так называемое прерываение выплнения ветки, иногда это break, а иногда это return, если этого не выполнить то будет выполняться следующая ветка после выпоняемой ветки. Иногда компилятор выдает предупреждение, что мы так называемое проваливаемся (fall through). Но иногда это нормальное поведение выполнение следующей ветки, но для этого надо добавить некий коментарии что вы намеренно так делаете.
 
-```
-// операция i = 15; некогда не будет выполнена
-switch (cond)
-{
-  i = 15;
-  ...
-  case 5:
-  ...
-}
-
-// все будет ок
-switch (cond)
-{
-int i;
-...
-case 5:
-i = 5;
-...
-}
-
-```
 ```cpp
 
 #include <iostream>
 
-enum EnumTest{
-  FIRST = 1,
-  SECOND,
-  THIRD,
-  FOURTH
+enum {
+  YES_UPPER = 'Y',
+  YES_LOWER = 'y',
+  NO_UPPER = 'N',
+  NO_LOWER = 'n'
 };
-
-void PrintEnumValue(EnumTest value) {
-  switch (value)
-  {
-    case FIRST:
-      printf("FIRST\n");
-      break;
-    case SECOND:
-      printf("SECOND\n");
-      break;
-    case THIRD:
-      printf("THIRD\n");
-      break;
-    case FOURTH:
-      printf("FOURTH\n");
-      break;
-    default:
-      printf("UNDEFINED\n");
-      break;
-  }
-}
-
-enum Bitset{
-  FIRST_SET_BIT = 1UL << 0,
-  SECOND_SET_BIT = 1UL << 1,
-  THIRD_SET_BIT = 1UL << 2,
-  FOURTH_SET_BIT = 1UL << 3
-};
-
-void CheckSetBit(Bitset value, Bitset bit) {
-  switch (value & bit)
-  {
-    case FIRST_SET_BIT:
-      printf("Set first bit\n");
-      break;
-     case SECOND_SET_BIT:
-      printf("Set second bit\n");
-      break;
-     case THIRD_SET_BIT:
-      printf("Set third bit\n");
-      break;
-     case FOURTH_SET_BIT:
-      printf("Set forth bit\n");
-      break;
-    default:
-      printf("Unset bit\n");
-      break;
-  }
-}
 
 int main(int argc, char const *argv[]) {
-  std::cout << "Please enter number" << std::endl;
-  int value;
-  std::cin >> value;
-  switch (value)
-  {
-    case 1:
-      printf("equal if (x == 1)\n");
-      break;
-    case 2:
-      printf("equal else if (x == 2)\n");
-      break;
-    case 3: case 4:
-      printf("equal else if (x == 3 || x == 4)\n");
-      break;
-    default:
-      printf("equal else\n");
-      break;
+  std::cout << "Please enter Yes or No (Y/y N/n)\n";
+  std::cout << ">>> ";
+  char answer; 
+  std::cin >> answer;
+  switch (answer) {
+   case YES_UPPER: case YES_LOWER: {
+    std::cout << "You said yes" << std::endl;
+    break;
+   }
+   case NO_UPPER: case NO_LOWER: {
+    std::cout << "You said no" << std::endl;
+    break;
+   }
+   default:
+    std::cout << "Unknown command, please try again...\n";
   }
-
-  PrintEnumValue(EnumTest::FIRST);
-  PrintEnumValue(static_cast<EnumTest>(value));
-
-  Bitset flag = static_cast<Bitset>(Bitset::FIRST_SET_BIT | Bitset::SECOND_SET_BIT);
-  CheckSetBit(flag, Bitset::SECOND_SET_BIT);
-  CheckSetBit(flag, Bitset::FOURTH_SET_BIT);
   return 0;
 }
 
 ```
+
+Стоит сделать важное замечание что значение выражение в ветках case должны быть или литералом или константой(т.е. compile time выражением), но не может быть переменной или константой значение которой может быть изестно на этапе выполнения программы.
+
 ## Операторы цикла
 Циклические операторы в отличие от условных, призваны повторять операции n-е количество раз.
 ### Оператор цикла for
@@ -291,44 +246,17 @@ for(;;) // такой цикл называеться бесконечным
 Смысл опреатора следующий, сначало выполняеться инициализация, потом проверяеться условие, выполнить тело цикла а затем итерацию, и т.д выполнять пока условие истино.
 ```cpp
 #include <iostream>
-#include <cstring>
 
 int main(int argc, char const *argv[]) {
-/*  for(;;) {
-    std::cout << "please enter number for summ count or zero for exit" << std::endl;
-    size_t count;
-    std::cin >> count;
-    long long summ = 0;
-    if (count > 0) {
-      for (size_t i = 0; i < count; ++i) {
-        std::cout << "please enter number for summ value" << std::endl;
-        int tmp;
-        std::cin >> tmp;
-        summ += tmp;
-      }
-      auto avarage = summ / static_cast<double>(count);
-      std::cout << "Avarage of summ " << summ << " is " << avarage << std::endl;
-    } else {
-      break;
-    }
-  }
-*/
-  const char *str = "Hello World";
-  size_t count;
-  for (count = 0; *str; ++count, ++str)
-    ;
-  std::cout << "count char in string " << str << " is " << count << std::endl;
-  std::cout << "Check with standard library function " << strlen("Hello World") << std::endl;
 
+  // пример бесконечного цикла если неверно указать тип счетчика и значение в проверке условия
+  uint16_t count = 300;
+  for (uint8_t i = 0; i < count; ++i) {
+   std::cout << (i + 1) << std::endl;
+  }
   
-  str = "Hello World";
-  size_t count_alpha = 0;
-  for (size_t i = 0; str[i] != '\0';) {
-    count_alpha += (str[i++] == 'l');
-  }
-
-  std::cout << "count char 'l' in string " << str << " is " << count_alpha << std::endl;
-
+  // разложение числа на цифры и проверка четности каждой цифры
+  // стоит заметить что value; в секции для проверки продолжительности цикла это равносильно value != 0
   for (size_t value = 34567, digit = 0; value; value /= 10) {
     if ((digit = (value % 10)) % 2 == 0) {
       std::cout << "digit " << digit << " is even \n";
@@ -336,11 +264,11 @@ int main(int argc, char const *argv[]) {
       std::cout << "digit " << digit << " is odd \n";
     }
   }
-  std::cout << std::endl;
-
   return 0;
 }
+
 ```
+Стоит помнить всегда что тип счетчика стоит выбирать как `size_t`, и тогда возможных проблем с бесконечным циклом вы точно не получите.
 ### Оператор while
 Если например при работе c for мы знаем количество итераций, например при обходе массива, то при работе c оператором while, это если мы не значем точное количество операций, и итерационная переменная может быть гибкая. Еще важным отличием оператора while от for есть то что итерационная переменная всегда выполняеться в конце итерации цикла for, то такой итерации в цикле while нет.
 Оператор while работает следующим образом пока условие истино выполняеться условие
@@ -352,83 +280,28 @@ while(условие) {
 ```cpp
 #include <iostream>
 
-void Print() {
-  std::cout << "Please enter number:" << std::endl;
-  size_t count;
-  std::cin >> count;
-  if (count > 1) {
-   size_t mid = count / 2;
-   int start = mid;
-   size_t end = mid;
-   while (start >= 0) {
-     for (int i = 0; i < start; ++i) {
-        std::cout << ' ';
-     }
-     for (int i = start; i <= end; ++i) {
-        std::cout << '*';
-     }
-     for (int i = end; i < count; ++i) {
-        std::cout << ' ';
-     }
-     --start;
-     ++end;
-     std::cout << '\n';
-   }
-  }
-}
-
-
-void memset_our() {
-  size_t value = 23;
-  while(value >>= 1) {
-    std::cout << "One iteration shift right" << std::endl;
-  }
-  std::cout << "value is " << value << std::endl;
-}
 
 int main(int argc, char const *argv[]) {
-/*  // обьявим бесконечный цикл
-  while (true) {
-    std::cout << "Please enter number or zero to exit" << std::endl;
-    int value;
-    std::cin >> value;
-    if (value > 0) {
-      while (value > 10) {
-          value /= 10;
-      }
-      std::cout << "Last digit is " << value << std::endl; 
-    } else {
-      break;
-    }
-  }
-*/
-  /*Print();
 
-  const char *str = "Hello World";
-  size_t count_white_space = 0;
-  size_t count_l_symbol = 0;
-  while(*str) {
-    char c;
-    switch(c = *str++) {
-      case ' ':
-        ++count_white_space;
-        break;
-      case 'l':
-        ++count_l_symbol;
-        break;        
-    }
+  // обнуление числа спомощью битовой арифметики, т.е. применяем оператор сдвига
+  size_t value = 23;
+  while(value >>= 1) {
+    std::cout << "One iteration shift right value = " << value << std::endl;
   }
-  std::cout << "whitespace " << count_white_space << " count l " << count_l_symbol << std::endl; 
+  std::cout << "value is " << value << std::endl;
 
-  std::cout << "Enter value" << std::endl;
-  size_t value;
-  while (std::cin >> value) {
-    std::cout << "Enter " << value << std::endl; 
+  std::cout << "Please enter number ";
+  std::cin >> value;
+
+  while(value != 0) {
+    std::cout << --value << " ";
   }
-*/
-  memset_our();
+  std::cout << std::endl;
+  
+  // выше два цикла абсолютно одинаковы но использую разный подход
   return 0;
 }
+
 ```
 ### Оператор цикла do while
 Отличием оператора do while от while, то что выполниться точно один проход, т.е. условие проверяеться не в конце а в начале
@@ -442,86 +315,6 @@ do {
 
 ```cpp
 #include <iostream>
-
-/*
-bool WgUtilsApplier::SetWgDevice() const {
-  int ret = 0;
-  wg_device device{};
-
-  memcpy(device.name, wg_dev_name_.c_str(), wg_dev_name_.length());
-  device.listen_port = GetWgListeningPort();
-  device.flags = static_cast<wg_device_flags>(WGDEVICE_HAS_PRIVATE_KEY |
-                                              WGDEVICE_HAS_LISTEN_PORT);
-
-  if (wg_key_is_zero(private_key_)) {
-    OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: wg key is zero for ",
-                      wg_dev_name_.c_str());
-  } else {
-    memcpy(device.private_key, private_key_, sizeof(private_key_));
-    if ((ret = wg_set_device(&device)) < 0) {
-      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to set device for ",
-                        wg_dev_name_.c_str(), " : ", strerror(ret));
-      ret = 0;
-    } else {
-      ret = 1;
-    }
-  }
-  return !!ret;
-*/
-
-/*
-bool WgUtilsApplier::SetWgDevice(const std::string& own_public_key) const {
-  bool result = false;
-  wg_device device{};
-
-  memcpy(device.name, wg_dev_name_.c_str(), wg_dev_name_.length());
-  device.listen_port = GetWgListeningPort();
-  device.flags = static_cast<wg_device_flags>(WGDEVICE_HAS_PRIVATE_KEY |
-                                              WGDEVICE_HAS_LISTEN_PORT);
-
-  do {
-    if (wg_key_is_zero(private_key_)) {
-      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: wg key is zero for ",
-                        wg_dev_name_.c_str());
-      break;
-    }
-
-    memcpy(device.private_key, private_key_, sizeof(private_key_));
-
-    // Set public key to device
-    if (!own_public_key.empty()) {
-      wg_key public_key;
-
-      int ret = wg_key_from_base64(public_key, own_public_key.c_str());
-      if (ret < 0) {
-        OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to convert the public key ",
-                          own_public_key, ": ", strerror(ret));
-        break;
-      }
-
-      if (wg_key_is_zero(public_key)) {
-        OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: public wg key is zero for ",
-                          wg_dev_name_.c_str());
-        break;
-      }
-
-      memcpy(device.public_key, public_key, sizeof(public_key));
-      device.flags = static_cast<wg_device_flags>(device.flags | WGDEVICE_HAS_PUBLIC_KEY);
-    }
-
-    int ret = wg_set_device(&device);
-    if (ret < 0) {
-      OLU_DLT_LOG_ERROR(__FUNCTION__, "Error: Unable to set device for ",
-                        wg_dev_name_.c_str(), " : ", strerror(ret));
-      break;
-    }
-
-    result = true;
-  } while (false);
-
-  return result;
-}
-*/
 
 int main(int argc, char const *argv[]) {
   char ch;
@@ -538,46 +331,9 @@ int main(int argc, char const *argv[]) {
    std::cin >> ch;
   } while (ch != 'Y');
 
-  http://www.diag.com/news/DoWhileFalse.html
-
-
   return 0;
 }
 ```
-### Тернарный опреатор
-Это просто сокращенная форма if else. Иммеет вид
-```
-переменная = условие ? опреатор в случае истиности : оператор в случае лжи;
 
-if (условие) {
-
-} else {
-
-}
-```
-```cpp
-#include <iostream>
-
-size_t IncDec(size_t value) {
-  return value & 1 ? value + 1 : value - 1;
-}
-
-int main(int argc, char const *argv[])
-{
-    char ch;
-    do {
-        size_t value;
-        std::cin >> value;
-        std::cout << IncDec(value) << std::endl;
-        std::cin >> ch;
-    } while(ch != 'Y');
-
-    size_t a = 5;
-    (void) (a > 5 ? std::cout << " a > 5\n" : std::cout << "a <= 5\n");
-    return 0;
-}
-```
-возвращаемое значение в тернарном операторе должно быть одного типа или иметь неявное преобразование.
-
-
+Кому более интересное практическое применения оператора `do while` рекомендую почитать эту ссылку http://www.diag.com/news/DoWhileFalse.html
 
